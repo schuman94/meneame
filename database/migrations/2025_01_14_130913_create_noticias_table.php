@@ -17,8 +17,9 @@ return new class extends Migration
             $table->text('descripcion');
             $table->string('imagen');
             $table->string('url');
+            $table->integer('meneos')->default(0);
             $table->foreignId('user_id')->constrained();
-            $table->integer('meneos');
+            $table->foreignId('categoria_id')->constrained();
             $table->timestamps();
         });
     }

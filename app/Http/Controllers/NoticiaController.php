@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
+use Illuminate\Support\Facades\Auth;
+
 use App\Models\Noticia;
 use Illuminate\Http\Request;
 
@@ -12,7 +15,9 @@ class NoticiaController extends Controller
      */
     public function index()
     {
-        //
+        return view('noticias.index', [
+            'noticias' => Noticia::all(),
+        ]);
     }
 
     /**
@@ -20,7 +25,10 @@ class NoticiaController extends Controller
      */
     public function create()
     {
-        //
+        $categorias = Categoria::all();
+        return view('noticias.create', [
+            'categorias' => $categorias
+        ]);
     }
 
     /**
@@ -28,7 +36,19 @@ class NoticiaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'required',
+            'url' => 'required|string',
+            'categoria_id' => 'required|integer|exists:categorias,id'
+        ]);
+
+        $validated['user_id'] = Auth::user();
+
+        $noticia = Noticia::create($validated);
+        session()->flash('exito', 'Noticia creada correctamente.');
+        return redirect()->route('noticias.show', $noticia);
     }
 
     /**
@@ -36,7 +56,9 @@ class NoticiaController extends Controller
      */
     public function show(Noticia $noticia)
     {
-        //
+        return view('noticias.show', [
+            'noticia' => $noticia,
+        ]);
     }
 
     /**
@@ -44,7 +66,9 @@ class NoticiaController extends Controller
      */
     public function edit(Noticia $noticia)
     {
-        //
+        return view('noticias.edit',[
+            'noticia' => $noticia,
+        ]);
     }
 
     /**
@@ -52,7 +76,18 @@ class NoticiaController extends Controller
      */
     public function update(Request $request, Noticia $noticia)
     {
-        //
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'required',
+            'url' => 'required|string',
+            'categoria_id' => 'required|integer|exists:categorias,id'
+        ]);
+
+        $noticia->fill($validated);
+        $noticia->save();
+        session()->flash('exito', 'Noticia modificada correctamente.');
+        return redirect()->route('noticias.index');
     }
 
     /**
@@ -60,6 +95,7 @@ class NoticiaController extends Controller
      */
     public function destroy(Noticia $noticia)
     {
-        //
+        $noticia->delete();
+        return redirect()->route('noticias.index');
     }
 }
