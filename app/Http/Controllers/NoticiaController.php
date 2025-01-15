@@ -16,7 +16,7 @@ class NoticiaController extends Controller
     public function index()
     {
         return view('noticias.index', [
-            'noticias' => Noticia::all(),
+            'noticias' => Noticia::orderBy('meneos', 'desc')->get(),
         ]);
     }
 
@@ -44,7 +44,7 @@ class NoticiaController extends Controller
             'categoria_id' => 'required|integer|exists:categorias,id'
         ]);
 
-        $validated['user_id'] = Auth::user();
+        $validated['user_id'] = Auth::id();
 
         $noticia = Noticia::create($validated);
         session()->flash('exito', 'Noticia creada correctamente.');
@@ -97,5 +97,15 @@ class NoticiaController extends Controller
     {
         $noticia->delete();
         return redirect()->route('noticias.index');
+    }
+
+    public function menear(Noticia $noticia)
+    {
+        if (isset($noticia)) {
+            $noticia->meneos++;
+            $noticia->save();
+            return redirect()->route('noticias.index');
+
+        }
     }
 }

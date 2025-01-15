@@ -36,7 +36,7 @@ class CategoriaController extends Controller
                 'string',
                 'unique:categorias,codigo',
             ],
-            'nombre' => 'required|string|exists:libros,id'
+            'nombre' => 'required|string'
         ]);
 
         $categoria = Categoria::create($validated);
